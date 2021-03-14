@@ -1,0 +1,15 @@
+{
+  "name": "chatgraphqlapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server"
+  },
+  "author": "Ashrafzhon Kurbonaliev",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.21.1",
+    "graphql": "^15.5.0"
+  }
+}
