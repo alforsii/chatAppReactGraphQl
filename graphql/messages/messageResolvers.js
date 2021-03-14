@@ -2,8 +2,9 @@ const { Message } = require("../../models/Message");
 
 exports.MessageResolvers = {
   Query: {
-    // messages: () => {
-    //   return [...messages];
+    // messages: async () => {
+    //   const messages = await Message.find();
+    //   return messages;
     // },
   },
   Mutation: {
@@ -14,13 +15,14 @@ exports.MessageResolvers = {
       pubSub.publish("MESSAGES", { messages });
       return newMessage;
     },
-    messages: async () => {
-      return await Message.find();
-    },
   },
   Subscription: {
     messages: {
       subscribe: (_, __, { pubSub }) => {
+        setTimeout(async () => {
+          const messages = await Message.find();
+          pubSub.publish("MESSAGES", { messages });
+        }, 0);
         return pubSub.asyncIterator("MESSAGES");
       },
     },

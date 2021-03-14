@@ -25,7 +25,7 @@ exports.RootTypeDefs = gql`
   }
 
   type Mutation {
-    messages: [Message]
+    # messages: [Message]
     addMessage(data: MessageInput!): Message
   }
 
