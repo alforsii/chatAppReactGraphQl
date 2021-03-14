@@ -1,84 +1,47 @@
-const { ApolloServer, gql, PubSub } = require("apollo-server");
+require("dotenv").config();
+const { ApolloServer, PubSub } = require("apollo-server-express");
+const { RootResolvers } = require("./graphql/rootResolvers");
+const { RootTypeDefs } = require("./graphql/rootTypeDefs");
+const express = require("express");
+const mongoose = require("mongoose");
 
-const messages = [];
-
-const RootTypeDefs = gql`
-  type Message {
-    id: ID!
-    context: String!
-    user: String!
-  }
-
-  type Query {
-    messages: [Message]
-  }
-
-  type Mutation {
-    addMessage(context: String!, user: String!): Message
-    messages: [Message]
-  }
-
-  type Subscription {
-    messages: [Message]
-  }
-`;
-
-const subscriptions = [];
-// const onNewMessage = (fn) => subscriptions.push(fn);
-
-const RootResolvers = {
-  Query: {
-    // messages: () => {
-    //   return [...messages];
-    // },
-  },
-  Mutation: {
-    addMessage: (root, args, { pubSub }) => {
-      const newMessage = {
-        id: messages.length,
-        ...args,
-      };
-      messages.push(newMessage);
-      // pubSub.publish("NEW_MESSAGE", { newMessage });
-      pubSub.publish("MESSAGES", { messages });
-      //   subscriptions.forEach((fn) => fn());
-      return newMessage;
-    },
-    messages: () => {
-      return [...messages];
-    },
-  },
-  //   getMessages: (_, _, { pubSub }) => pubSub.publish("MESSAGES", { messages }),
-  Subscription: {
-    // newMessage: {
-    //   subscribe: (root, args, { pubSub }) =>
-    //     pubSub.asyncIterator("NEW_MESSAGE"),
-    // },
-    messages: {
-      subscribe: (_, __, { pubSub }) => {
-        // const userChannel = Math.random().toString(36).slice(2, 15);
-        // onNewMessage(() => pubSub.publish(userChannel, { messages }));
-        // setTimeout(() => pubSub.publish(userChannel, { messages }), 0);
-        return pubSub.asyncIterator("MESSAGES");
-      },
-    },
-  },
-};
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useNewUrlParser: true,
+    useCreateIndex: true,
+  })
+  .then((db) => {
+    console.log(`Connected to DB: ${db.connections[0].name} `);
+  })
+  .catch((err) => console.log(`Error in DB connection ${err}`));
 
 const pubSub = new PubSub();
 const server = new ApolloServer({
   typeDefs: RootTypeDefs,
   resolvers: RootResolvers,
-  subscriptions: {
-    path: "/",
-  },
+  // subscriptions: {
+  //   path: "/",
+  // },
+  subscriptions: { path: "/" },
   context: { pubSub },
 });
 
-server
-  .listen(8000)
-  .then((serverResponse) => {
-    console.log(`Server ready at ${serverResponse.url}`);
-    console.log(`🚀 Subscriptions ready at ${serverResponse.subscriptionsUrl}`);
-  })
-  .catch((err) => console.log(`Error in apollo server ${err}`));
+const app = express();
+const http = require("http");
+const PORT = process.env.PORT || 8000;
+server.applyMiddleware({ app, path: "/", cors: false });
+
+const httpServer = http.createServer(app);
+server.installSubscriptionHandlers(httpServer);
+
+// Make sure to call listen on httpServer, NOT on app.
+httpServer.listen(PORT, () => {
+  console.log(
+    `🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`
+  );
+  console.log(
+    `🚀 Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}`
+  );
+});
