@@ -1,17 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSubscription, useMutation, gql } from "@apollo/client";
 
 const MESSAGES_SUB = gql`
   subscription {
-    messages {
-      id
-      username
-      content
-    }
-  }
-`;
-const MESSAGES_MUTATION = gql`
-  mutation {
     messages {
       id
       username
@@ -32,25 +23,12 @@ const NEW_MESSAGE = gql`
 
 const Messages = ({ username }) => {
   const { data } = useSubscription(MESSAGES_SUB);
-
-  const [messages, setMessages] = useState([]);
-
-  const [GetMessages] = useMutation(MESSAGES_MUTATION);
-  useEffect(() => {
-    setMessages(data?.messages);
-  }, [data]);
-  useEffect(() => {
-    GetMessages()
-      .then(({ data }) => {
-        setMessages(data.messages);
-      })
-      .catch((err) => console.log(err));
-    // eslint-disable-next-line
-  }, []);
-
+  if (!data) {
+    return null;
+  }
   return (
     <div>
-      {messages?.map(({ id, username: theUsername, content }) => (
+      {data?.messages?.map(({ id, username: theUsername, content }) => (
         <p key={id}>
           <span
             style={

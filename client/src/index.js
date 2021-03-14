@@ -9,9 +9,9 @@ const wsLink = new WebSocketLink({
   uri: "ws://localhost:8000/",
   options: {
     reconnect: true,
-    // connectionParams: {
-    //   authToken: user.authToken,
-    // },
+    connectionParams: {
+      authToken: "user.authToken",
+    },
   },
 });
 
