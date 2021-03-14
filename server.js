@@ -10,11 +10,11 @@ require("./configs/db.configs");
 // ApolloServer configs
 const { apolloServer } = require("./configs/apolloServer.configs");
 
-app.use((req, res, next) => {
-  const authHeader = req.get("Authorization");
-  console.log(authHeader);
-  next();
-});
+// app.use((req, res, next) => {
+//   const authHeader = req.get("Authorization");
+//   // console.log(authHeader);
+//   next();
+// });
 
 apolloServer.installSubscriptionHandlers(httpServer);
 apolloServer.applyMiddleware({ app, path: "/", cors: false });

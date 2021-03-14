@@ -20,13 +20,34 @@ exports.RootTypeDefs = gql`
     # userId: ID!
   }
 
+  input SignupInput {
+    email: String!
+    password: String!
+    firstName: String
+    lastName: String
+  }
+
+  type AuthData {
+    userId: ID
+    token: String
+    tokenExpiration: Int
+    message: String
+  }
+
   type Query {
     messages: [Message]
+    allUsers: [User!]!
+    getUser(id: ID!): User
+    isLoggedIn(token: String!): AuthData!
+    someUsers(page: Int!, limit: Int!): [User!]!
   }
 
   type Mutation {
     # messages: [Message]
     addMessage(data: MessageInput!): Message
+    signup(data: SignupInput!): User!
+    login(email: String!, password: String!): AuthData!
+    remove: Boolean
   }
 
   type Subscription {
