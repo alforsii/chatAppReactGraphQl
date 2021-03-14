@@ -1,0 +1,7 @@
+.auth-form a:hover {
+  background-color: transparent !important;
+  color: rgb(4, 138, 228);
+}
+.noHover:hover {
+  background-color: rgba(98, 189, 241, 0.2) !important;
+}

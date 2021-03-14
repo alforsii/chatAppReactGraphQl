@@ -43,10 +43,10 @@ const Messages = ({ username }) => {
     </div>
   );
 };
-export default function Chat() {
+export default function Chat(props) {
   //   const [messages, setMessages] = useState([]);
 
-  const [postMessage] = useMutation(NEW_MESSAGE);
+  const [AddMessage] = useMutation(NEW_MESSAGE);
   const [state, setState] = useState({
     username: "Ash",
     content: "",
@@ -58,7 +58,7 @@ export default function Chat() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (state.username && state.content) {
-      postMessage({
+      AddMessage({
         variables: state,
       });
       setState({ ...state, content: "" });
@@ -85,6 +85,14 @@ export default function Chat() {
           <input type="submit" value="Submit" />
         </div>
       </form>
+      <button
+        onClick={() => {
+          props.updateState({ token: null });
+          localStorage.clear();
+        }}
+      >
+        Logout
+      </button>
     </div>
   );
 }
