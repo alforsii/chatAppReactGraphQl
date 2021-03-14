@@ -5,8 +5,8 @@ const MESSAGES_SUB = gql`
   subscription {
     messages {
       id
-      user
-      context
+      username
+      content
     }
   }
 `;
@@ -14,23 +14,23 @@ const MESSAGES_MUTATION = gql`
   mutation {
     messages {
       id
-      user
-      context
+      username
+      content
     }
   }
 `;
 
 const NEW_MESSAGE = gql`
-  mutation($context: String!, $user: String!) {
-    addMessage(context: $context, user: $user) {
+  mutation($content: String!, $username: String!) {
+    addMessage(data: { content: $content, username: $username }) {
       id
-      context
-      user
+      content
+      username
     }
   }
 `;
 
-const Messages = ({ user }) => {
+const Messages = ({ username }) => {
   const { data } = useSubscription(MESSAGES_SUB);
 
   const [messages, setMessages] = useState([]);
@@ -50,14 +50,16 @@ const Messages = ({ user }) => {
 
   return (
     <div>
-      {messages?.map(({ id, user: theUser, context }) => (
+      {messages?.map(({ id, username: theUsername, content }) => (
         <p key={id}>
           <span
-            style={user === theUser ? { color: "green" } : { color: "gray" }}
+            style={
+              username === theUsername ? { color: "green" } : { color: "gray" }
+            }
           >
-            {theUser}
+            {theUsername}
           </span>
-          : {context}
+          : {content}
         </p>
       ))}
     </div>
@@ -68,8 +70,8 @@ export default function Chat() {
 
   const [postMessage] = useMutation(NEW_MESSAGE);
   const [state, setState] = useState({
-    user: "Ash",
-    context: "",
+    username: "Ash",
+    content: "",
   });
 
   const handleChange = (e) => {
@@ -77,30 +79,30 @@ export default function Chat() {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (state.user && state.context) {
+    if (state.username && state.content) {
       postMessage({
         variables: state,
       });
-      setState({ ...state, context: "" });
+      setState({ ...state, content: "" });
     }
   };
 
   return (
     <div>
-      <Messages user={state.user} />
+      <Messages username={state.username} />
       <form onSubmit={handleSubmit}>
         <div style={{ display: "flex" }}>
           <input
             onChange={handleChange}
-            name="user"
+            name="username"
             placeholder="username"
-            value={state.user}
+            value={state.username}
           />
           <input
             onChange={handleChange}
-            name="context"
-            placeholder="context"
-            value={state.context}
+            name="content"
+            placeholder="content"
+            value={state.content}
           />
           <input type="submit" value="Submit" />
         </div>
