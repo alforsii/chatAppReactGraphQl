@@ -15,41 +15,52 @@ const RootTypeDefs = gql`
 
   type Mutation {
     addMessage(context: String!, user: String!): Message
+    messages: [Message]
   }
 
   type Subscription {
     messages: [Message]
-    addMessage: Message
   }
 `;
 
+const subscriptions = [];
+// const onNewMessage = (fn) => subscriptions.push(fn);
+
 const RootResolvers = {
   Query: {
-    messages: () => {
-      pubSub.publish("MESSAGES", { messages });
-      return [...messages];
-    },
+    // messages: () => {
+    //   return [...messages];
+    // },
   },
   Mutation: {
     addMessage: (root, args, { pubSub }) => {
-      const newMsg = {
+      const newMessage = {
         id: messages.length,
         ...args,
       };
-      messages.push(newMsg);
-      pubSub.publish("NEW_MESSAGE", { addMessage: newMsg });
-
-      return newMsg;
+      messages.push(newMessage);
+      // pubSub.publish("NEW_MESSAGE", { newMessage });
+      pubSub.publish("MESSAGES", { messages });
+      //   subscriptions.forEach((fn) => fn());
+      return newMessage;
+    },
+    messages: () => {
+      return [...messages];
     },
   },
   //   getMessages: (_, _, { pubSub }) => pubSub.publish("MESSAGES", { messages }),
   Subscription: {
-    addMessage: {
-      subscribe: (root, args, { pubSub }) =>
-        pubSub.asyncIterator(["NEW_MESSAGE"]),
-    },
+    // newMessage: {
+    //   subscribe: (root, args, { pubSub }) =>
+    //     pubSub.asyncIterator("NEW_MESSAGE"),
+    // },
     messages: {
-      subscribe: (_, __, { pubSub }) => pubSub.asyncIterator(["MESSAGES"]),
+      subscribe: (_, __, { pubSub }) => {
+        // const userChannel = Math.random().toString(36).slice(2, 15);
+        // onNewMessage(() => pubSub.publish(userChannel, { messages }));
+        // setTimeout(() => pubSub.publish(userChannel, { messages }), 0);
+        return pubSub.asyncIterator("MESSAGES");
+      },
     },
   },
 };
