@@ -1,0 +1,115 @@
+.messages {
+  /* padding: 10px; */
+  padding: 20px;
+  background-color: #fff;
+  scroll-behavior: smooth;
+  max-width: 678px;
+  /* position: relative; */
+
+  height: 100%;
+}
+.message {
+  position: relative;
+}
+.message i {
+  font-size: 0.8rem;
+  padding: 0 15px;
+}
+
+.other_user {
+  color: rgb(190, 187, 187);
+}
+.message_content {
+  background: #f1f1f1;
+
+  /* border-top-left-radius: 0;
+  border-bottom-left-radius: 30px; */
+}
+
+.user_message_content {
+  background: rgb(34, 226, 34);
+  color: #fff;
+  /* border-bottom-right-radius: 0;
+  border-top-right-radius: 30px; */
+}
+.single_message {
+  /* animation-name: msg_slide_down;
+  animation-timing-function: ease-in;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+  opacity: 0;
+  position: relative;
+  top: -1000px;
+  position: relative; */
+  max-width: 60%;
+  min-height: 20px;
+  margin: 5px;
+  padding: 7px 15px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 20px;
+  word-wrap: break-word;
+  position: relative;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25),
+    0 0 0px rgba(0, 0, 0, 0.25) inset;
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25),
+    0 0 0px rgba(0, 0, 0, 0.25) inset;
+  box-shadow: 0 1px 4px rgba(143, 143, 143, 0.25),
+    0 0 0px rgba(0, 0, 0, 0.25) inset;
+}
+.opacity_none {
+  opacity: 0;
+}
+.opacity_animation {
+  animation-name: opacity;
+  animation-timing-function: ease-in-out;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+.box_shadow {
+  /* box-shadow: 10px 20px 20px rgba(0, 0, 0, 0.15); */
+  /* box-shadow: 0 2.8px 2.2px rgba(0, 0, 0, 0.034),
+    0 6.7px 5.3px rgba(0, 0, 0, 0.048), 0 12.5px 10px rgba(0, 0, 0, 0.06),
+    0 22.3px 17.9px rgba(0, 0, 0, 0.072), 0 41.8px 33.4px rgba(0, 0, 0, 0.086),
+    0 100px 80px rgba(0, 0, 0, 0.12); */
+  animation-name: opacity;
+  animation-timing-function: ease-in-out;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+  padding: 5px;
+  z-index: 1000;
+  cursor: pointer;
+  width: 100%;
+  background-color: white;
+  box-sizing: border-box;
+  border-radius: 30px;
+  transform: scaleX(1.03);
+}
+.box_shadow {
+  position: relative;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1),
+    0 0 0px rgba(0, 0, 0, 0.1) inset;
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1),
+    0 0 0px rgba(0, 0, 0, 0.1) inset;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1), 0 0 0px rgba(0, 0, 0, 0.1) inset;
+}
+
+@keyframes opacity {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes msg_slide_down {
+  from {
+    top: -50px;
+    opacity: 0;
+  }
+  to {
+    top: 0;
+    opacity: 1;
+  }
+}

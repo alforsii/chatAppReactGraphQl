@@ -10,24 +10,6 @@ const generateToken = (userId, email) => {
 
 exports.AuthResolvers = {
   Query: {
-    isLoggedIn: (_, { token }) => {
-      if (!token || token === "") {
-        return null;
-      }
-      let decodedToken;
-      try {
-        decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
-      } catch (err) {
-        console.log(err.message);
-        return err;
-      }
-
-      if (!decodedToken || !decodedToken.userId || !decodedToken.email) {
-        throw new Error("Not authorized!");
-      }
-      // const newToken = generateToken(decodedToken.userId, decodedToken.email);
-      return { userId: decodedToken.userId, token, tokenExpiration: 1 };
-    },
     allUsers: async (_, args) => {
       return await User.find().sort({ _id: 1 });
     },
@@ -44,6 +26,23 @@ exports.AuthResolvers = {
     },
   },
   Mutation: {
+    isLoggedIn: (_, { token }) => {
+      if (!token || token === "") {
+        return null;
+      }
+      let decodedToken;
+      try {
+        decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
+        if (!decodedToken || !decodedToken.userId || !decodedToken.email) {
+          throw new Error("Not authorized!");
+        }
+        // const newToken = generateToken(decodedToken.userId, decodedToken.email);
+        return { userId: decodedToken.userId, token, tokenExpiration: 1 };
+      } catch (err) {
+        console.log(err.message);
+        return err;
+      }
+    },
     signup: async (_, { data }) => {
       try {
         let user = await User.findOne({ email: data.email });
@@ -58,8 +57,7 @@ exports.AuthResolvers = {
         return { message: err.message };
       }
     },
-    login: async (_, { email, password }, { req, token: theToken }) => {
-      console.log("🚀 { email, password }", { email, password });
+    login: async (_, { email, password }) => {
       try {
         const user = await User.findOne({ email });
         if (!user) {

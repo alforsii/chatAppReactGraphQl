@@ -12,6 +12,7 @@ exports.RootTypeDefs = gql`
     content: String!
     username: String!
     user: User
+    createdAt: String!
   }
 
   input MessageInput {
@@ -38,7 +39,6 @@ exports.RootTypeDefs = gql`
     messages: [Message]
     allUsers: [User!]!
     getUser(id: ID!): User
-    isLoggedIn(token: String!): AuthData!
     someUsers(page: Int!, limit: Int!): [User!]!
   }
 
@@ -47,6 +47,7 @@ exports.RootTypeDefs = gql`
     addMessage(data: MessageInput!): Message
     signup(data: SignupInput!): User!
     login(email: String!, password: String!): AuthData!
+    isLoggedIn(token: String!): AuthData!
     remove: Boolean
   }
 

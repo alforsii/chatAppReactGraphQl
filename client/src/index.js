@@ -5,14 +5,14 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import { WebSocketLink } from "@apollo/client/link/ws";
-const token = localStorage.getItem("token");
+
 const wsLink = new WebSocketLink({
   uri: "ws://localhost:8000/",
   options: {
     reconnect: true,
-    connectionParams: {
-      authToken: JSON.parse(token),
-    },
+    // connectionParams: {
+    //   authToken: JSON.parse(token),
+    // },
   },
 });
 

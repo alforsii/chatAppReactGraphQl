@@ -17,10 +17,10 @@ const LOGIN_QUERY = gql`
 `;
 
 export const LoginForm = (props) => {
+  const [Login] = useMutation(LOGIN_QUERY);
   const [errMessage, setErrMessage] = useState(null);
   const emailEl = React.createRef();
   const passwordEl = React.createRef();
-  const [Login] = useMutation(LOGIN_QUERY);
   // 1. One way of setting contextType for the class component
   // static contextType = AuthContext;
 
@@ -38,7 +38,7 @@ export const LoginForm = (props) => {
       return;
     }
     try {
-      const { data, errors } = await Login({ variables: { email, password } });
+      const { data } = await Login({ variables: { email, password } });
       // if (!data && errors.length) {
       //   return setErrMessage(errors[0].message);
       // }
@@ -54,16 +54,18 @@ export const LoginForm = (props) => {
   };
 
   useEffect(() => {
-    clearForm();
     // context.updateState({ message: "" });
+    clearForm();
     return () => {
       console.log("LOGIN CLEARED");
     };
+    // eslint-disable-next-line
   }, []);
 
   const clearForm = () => {
     emailEl.current.value = "";
     passwordEl.current.value = "";
+    setErrMessage("");
   };
 
   // openSignupForm = () => {
