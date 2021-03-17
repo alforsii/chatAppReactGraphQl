@@ -13,11 +13,9 @@ const NEW_MESSAGE = gql`
 `;
 
 export const AddMessage = (props) => {
-  //   const [messages, setMessages] = useState([]);
-
   const [AddMessage] = useMutation(NEW_MESSAGE);
   const [state, setState] = useState({
-    username: "Ash",
+    username: props.username,
     content: "",
   });
 
@@ -54,7 +52,6 @@ export const AddMessage = (props) => {
             value={state.username}
             className="add_form_input"
           />
-          {/* <label htmlFor="username">User</label> */}
         </div>
         <div style={{ width: "100%" }}>
           <input
@@ -66,7 +63,6 @@ export const AddMessage = (props) => {
             value={state.content}
             className="add_form_input"
           />
-          {/* <label htmlFor="content">Message</label> */}
         </div>
         <input className="add_form_btn" type="submit" value="Send" />
       </div>

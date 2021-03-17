@@ -1,40 +1,48 @@
-import React, { Component } from "react";
-import { AuthContext } from "../../context/AuthContext";
-import { myToaster } from "../../auth/helpers";
-import axios from "axios";
+import { gql, useMutation } from "@apollo/client";
+import React, { useState } from "react";
+import { Form, Container, Button } from "react-bootstrap";
+import { NavLink } from "react-router-dom";
 
-export default class Signup extends Component {
-  constructor(props) {
-    super(props);
-    this.emailEl = React.createRef();
-    this.passwordEl = React.createRef();
-    this.firstNameEl = React.createRef();
-    this.lastNameEl = React.createRef();
+const SIGNUP_MUTATION = gql`
+  mutation(
+    $email: String!
+    $password: String!
+    $firstName: String!
+    $lastName: String!
+  ) {
+    signup(
+      data: {
+        email: $email
+        password: $password
+        firstName: $firstName
+        lastName: $lastName
+      }
+    ) {
+      id
+      email
+    }
   }
-  state = {
+`;
+
+export const Signup = (props) => {
+  console.log("🚀 ~ file: Signup.js ~ line 28 ~ Signup ~ props", props);
+  const [state, setState] = useState({
     message: "",
-  };
+    emailEl: React.createRef(),
+    passwordEl: React.createRef(),
+    firstNameEl: React.createRef(),
+    lastNameEl: React.createRef(),
+  });
   // 1. One way of setting contextType for the class component
-  static contextType = AuthContext;
 
-  componentWillUnmount = () => {
-    this.clearForm();
-    console.log("SIGNUP CLEARED");
-  };
+  const [Signup] = useMutation(SIGNUP_MUTATION);
 
-  clearForm = () => {
-    this.emailEl.current.value = "";
-    this.passwordEl.current.value = "";
-    this.firstNameEl.current.value = "";
-    this.lastNameEl.current.value = "";
-  };
-
-  handleSignupSubmit = (e) => {
+  const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    const email = this.emailEl.current.value;
-    const password = this.passwordEl.current.value;
-    const firstName = this.firstNameEl.current.value;
-    const lastName = this.lastNameEl.current.value;
+    const email = state.emailEl.current.value;
+    const password = state.passwordEl.current.value;
+    const firstName = state.firstNameEl.current.value;
+    const lastName = state.lastNameEl.current.value;
     // console.log(email, password);
 
     if (
@@ -43,154 +51,72 @@ export default class Signup extends Component {
       firstName.trim().length === 0 ||
       lastName.trim().length === 0
     ) {
-      return this.setState((prevState) => ({
+      return setState((prevState) => ({
         ...prevState,
         message: "All fields are mandatory!",
       }));
     }
     const newUser = { email, password, firstName, lastName };
-    let requestBody = {
-      query: `
-
-        mutation Signup($email:String!,$password:String!,$firstName:String!,$lastName:String!){
-          signup(data: {email:$email,password: $password,firstName:$firstName,lastName:$lastName}) {
-            _id
-            email
-            message
-          }
-        }
-      `,
-      variables: newUser,
-    };
-
-    axios
-      .post("http://localhost:3001/graphql", requestBody)
-      .then((res) => {
-        console.log(res);
-
-        const msg = res.data.data.signup?.message;
-        if (res.status === 200 && msg) {
-          myToaster(msg, "yellow");
-          return this.setState({
-            message: msg,
-          });
-        }
-
-        this.context.updateState({
-          message: "Signup successful, please login now!",
-        });
-        this.props.closeSignupForm();
-      })
-      .catch((err) => {
-        console.log(err);
-        myToaster("Something went wrong! 😕", "yellow");
-        this.setState({
-          message: "Something went wrong! 😕",
-        });
-        // this.clearForm();
-      });
-
-    //   2. Another way using fetch, but will not response error message :(
-    // fetch("http://localhost:3001/graphql", {
-    //   method: "POST",
-    //   body: JSON.stringify(requestBody),
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    // })
-    //   .then((res) => {
-    //     if (res.status !== 200 && res.status !== 201) {
-    //       throw new Error("Req failed!");
-    //     }
-    //     return res.json();
-    //   })
-    //   .then((res) => {
-    //     console.log(res);
-    //     // this.props.updateState({ isLoggedIn: true });
-    //     // console.log("🚀 ~ this.props", this.props);
-    //     this.context.updateState({
-    //       message: "Signup successful, please login now!",
-    //     });
-    //     this.props.closeSignupForm();
-    //   })
-    //   .catch((err) => console.log(err));
+    try {
+      const { data, errors } = await Signup({ variables: newUser });
+      if (!data) return null;
+      if (errors?.length)
+        return setState({ ...state, message: errors[0].message });
+      props.updateState({ message: "Signup successful! Please login now." });
+      props.history.push("/");
+    } catch (err) {
+      console.log("🚀 err", err);
+      return setState({ ...state, message: err.message });
+    }
   };
 
-  render() {
-    return (
-      <form style={{ width: "500px" }} onSubmit={this.handleSignupSubmit}>
+  return (
+    <Container style={{ maxWidth: "400px" }}>
+      <Form onSubmit={handleSignupSubmit}>
         <span style={{ padding: 10 }} className="red-text">
-          {this.state.message && this.state.message}
+          {state.message && state.message}
         </span>
-        <div
-          style={{
-            backgroundColor: "#fff",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.25)",
-          }}
-          className="row"
-        >
-          <div className="col s12">
-            <div className="">
-              <div className="row">
-                <div className="input-field col s12 m10 offset-m1">
-                  <h4 className="blue-text">Signup</h4>
-                </div>
-                <div className="input-field col s12 m10 offset-m1">
-                  <input
-                    id="email"
-                    className="validate"
-                    type="email"
-                    ref={this.emailEl}
-                  />
-                  <label htmlFor="email">Email</label>
-                </div>
-                <div className="input-field col s12 m10 offset-m1">
-                  <input
-                    id="password"
-                    type="password"
-                    className="validate"
-                    ref={this.passwordEl}
-                  />
-                  <label htmlFor="password">Password</label>
-                </div>
-                <div className="input-field col s12 m10 offset-m1">
-                  <input
-                    id="firstName"
-                    type="text"
-                    className="validate"
-                    ref={this.firstNameEl}
-                  />
-                  <label htmlFor="firstName">First Name</label>
-                </div>
-                <div className="input-field col s12 m10 offset-m1">
-                  <input
-                    id="lastName"
-                    type="text"
-                    className="validate"
-                    ref={this.lastNameEl}
-                  />
-                  <label htmlFor="lastName">lastName</label>
-                </div>
-                <div
-                  style={{ display: "flex", justifyContent: "flex-end" }}
-                  className="col s12 m10 offset-m1"
-                >
-                  <button
-                    onClick={this.props.closeSignupForm}
-                    className="btn btn-flat noHover"
-                    style={{ marginRight: 10 }}
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn blue">
-                    Signup
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </form>
-    );
-  }
-}
+        <h2 className="primary_color">Signup</h2>
+        <Form.Row>
+          <Form.Control
+            className="mb-2 mr-sm-2"
+            type="email"
+            ref={state.emailEl}
+            placeholder="Email"
+          />
+          <Form.Control
+            className="mb-2 mr-sm-2"
+            type="password"
+            ref={state.passwordEl}
+            placeholder="Password"
+          />
+          <Form.Control
+            className="mb-2 mr-sm-2"
+            type="text"
+            ref={state.firstNameEl}
+            placeholder="First name"
+          />
+          <Form.Control
+            className="mb-2 mr-sm-2"
+            type="text"
+            ref={state.lastNameEl}
+            placeholder="Last name"
+          />
+          <Button type="submit" variant="outline-primary" className="mb-2">
+            Signup
+          </Button>
+          <Form.Row>
+            <Form.Check
+              type="checkbox"
+              disabled
+              className="mb-2 ml-4 mr-sm-2"
+              id="inlineFormCheck"
+              label="Go to "
+            />
+            <NavLink to="/">Login</NavLink>
+          </Form.Row>
+        </Form.Row>
+      </Form>
+    </Container>
+  );
+};

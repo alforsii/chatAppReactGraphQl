@@ -1,5 +1,6 @@
 import React from "react";
 import moment from "moment";
+import { Image } from "react-bootstrap";
 
 export default function GroupedMessages({ id, type, messages, name }) {
   const handleTimeToggle = (msgId) => {
@@ -35,7 +36,7 @@ export default function GroupedMessages({ id, type, messages, name }) {
             }}
           >
             {type === "sent" && (
-              <i id={msg.id} className="opacity_none">
+              <i id={msg.id} className="opacity_none text-muted">
                 {moment(time).utc(myUTC).format("MMM Do YYYY, h:mm a")}
               </i>
             )}
@@ -54,20 +55,35 @@ export default function GroupedMessages({ id, type, messages, name }) {
                   : {}
               }
               className={`message ${
-                type === "sent" ? "user_messages" : "others_messages"
+                type === "sent" ? "user_messages" : "others_messages text-muted"
               }`}
             >
               {msg.text}
             </p>
             {type === "received" && (
-              <i id={msg.id} className="opacity_none">
+              <i id={msg.id} className="opacity_none text-muted">
                 {moment(time).utc(myUTC).format("MMM Do YYYY, h:mm a")}
               </i>
             )}
           </div>
         );
       })}
-      {type === "received" && <h5 className="other_user">{name}</h5>}
+      {type === "received" && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            alignItems: "center",
+          }}
+        >
+          <Image
+            style={{ width: "40px", height: "40px" }}
+            src="https://source.unsplash.com/user/erondu"
+            roundedCircle
+          />
+          <p className="other_user text-muted">{name}</p>
+        </div>
+      )}
     </div>
   );
 }
