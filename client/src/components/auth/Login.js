@@ -54,6 +54,7 @@ export const LoginForm = (props) => {
             }
             const { userId, token } = data.login;
             console.log(data);
+
             context.getUserDetails(userId, token);
             // context.updateState({ token: data.login?.token });
             localStorage.setItem("token", JSON.stringify(data.login?.token));

@@ -10,7 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 
 const wsLink = new WebSocketLink({
-  uri: "ws://localhost:8000/",
+  uri: "ws://localhost:8000/subscriptions",
   options: {
     reconnect: true,
     // connectionParams: {
@@ -21,7 +21,7 @@ const wsLink = new WebSocketLink({
 
 const client = new ApolloClient({
   link: wsLink,
-  uri: "http://localhost:8000/",
+  uri: "http://localhost:8000/graphql",
   cache: new InMemoryCache(),
 });
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { gql, useMutation } from "@apollo/client";
 import { Route, Switch, Redirect } from "react-router-dom";
-import { Button } from "react-bootstrap";
+import { Alert } from "react-bootstrap";
 
 import Chat from "./components/chat/Chat";
 import { LoginForm } from "./components/auth/Login";
@@ -31,11 +31,13 @@ const GET_USER_QUERY = gql`
 function App() {
   const [IsLoggedIn] = useMutation(IS_LOGGED_QUERY);
   const [GetUser] = useMutation(GET_USER_QUERY);
+
   const [state, setState] = useState({
     token: "",
     user: null,
     isLoading: false,
     message: "",
+    userId: null,
   });
 
   const updateState = (data) => {
@@ -54,7 +56,14 @@ function App() {
       return setState({ ...state, message: errors[0].message });
     }
 
-    updateState({ token, isLoading: false, user: data.getUser });
+    updateState({
+      token,
+      userId: id,
+      isLoading: false,
+      user: data.getUser,
+      message: "",
+    });
+    return data.getUser.id;
   };
 
   const isLoginValid = async () => {
@@ -62,6 +71,7 @@ function App() {
       updateState({ isLoading: true });
       const token = JSON.parse(localStorage.getItem("token"));
       const { data } = await IsLoggedIn({ variables: { token } });
+
       if (!data || !data.isLoggedIn.token) {
         handleLogout();
         return null;
@@ -102,19 +112,45 @@ function App() {
           logout={handleLogout}
           username={state.user?.email}
         />
-        {state.message && state.message}
+        {state.message && (
+          <Alert
+            variant={state.token && state.message ? "success" : "warning"}
+            onClose={() => updateState({ message: "" })}
+            dismissible
+          >
+            <Alert.Heading>{state.message}</Alert.Heading>
+          </Alert>
+        )}
         <Switch>
           {!state.token && <Redirect from="/chat" to="/" exact />}
           {state.token && <Redirect from="/" to="/chat" exact />}
 
           {state.token ? (
-            <Route
-              path="/chat"
-              exact
-              render={(props) => (
-                <Chat {...props} username={state.user?.email} />
-              )}
-            />
+            <>
+              <Route
+                path="/chat"
+                exact
+                render={(props) => (
+                  <Chat
+                    {...props}
+                    username={state.user?.email}
+                    userId={state.userId}
+                  />
+                )}
+              />
+
+              <Route
+                path="/chat/:id"
+                exact
+                render={(props) => (
+                  <Chat
+                    {...props}
+                    username={state.user?.email}
+                    userId={state.userId}
+                  />
+                )}
+              />
+            </>
           ) : (
             <>
               <Route

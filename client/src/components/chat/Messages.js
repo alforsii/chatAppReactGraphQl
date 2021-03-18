@@ -1,23 +1,31 @@
 import { useSubscription, gql } from "@apollo/client";
 import React, { useEffect, useState } from "react";
+import { Spinner } from "react-bootstrap";
 import GroupedMessages from "./GroupedMessages";
 
 import "./Messages.css";
 
 const MESSAGES_SUB = gql`
-  subscription {
-    messages {
+  subscription($chatId: ID!) {
+    messages(chatId: $chatId) {
       id
       username
       content
+      messageAuthor {
+        id
+        firstName
+        lastName
+      }
       createdAt
     }
   }
 `;
 
-export const Messages = ({ username }) => {
-  const { data, loading } = useSubscription(MESSAGES_SUB);
+export const Messages = ({ username, chatId }) => {
   const [sortedMessages, setSortedMessages] = useState([]);
+  const { data, loading, error } = useSubscription(MESSAGES_SUB, {
+    variables: { chatId },
+  });
 
   //   Sorted messages structure: {
   //    id: message id / later will be userId,
@@ -27,6 +35,7 @@ export const Messages = ({ username }) => {
   //    messages: grouped lines of messages that belongs to the same user, which is between two users on the chat.
   // }
   const sortMessages = () => {
+    if (error) return console.log(error.message);
     if (data?.messages?.length) {
       let userMessages = [];
       const newSortedMessages = [];
@@ -91,6 +100,8 @@ export const Messages = ({ username }) => {
       setSortedMessages(newSortedMessages);
       const messagesEl = document.querySelector(".messages");
       messagesEl.scrollTop = messagesEl.scrollHeight;
+    } else {
+      setSortedMessages([]);
     }
   };
 
@@ -109,13 +120,15 @@ export const Messages = ({ username }) => {
       className="box_shadow messages"
     >
       {loading ? (
-        <h5>Loading...</h5>
+        <Spinner animation="border" role="status">
+          <span className="sr-only">Loading...</span>
+        </Spinner>
       ) : sortedMessages.length ? (
         sortedMessages?.map((msgData) => (
           <GroupedMessages key={msgData.id} {...msgData} />
         ))
       ) : (
-        <p>You have no messages!</p>
+        <p>You have no messages in this Chat!</p>
       )}
     </div>
   );

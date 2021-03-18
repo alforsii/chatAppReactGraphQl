@@ -3,8 +3,15 @@ import { useMutation, gql } from "@apollo/client";
 import "./AddMessage.css";
 
 const NEW_MESSAGE = gql`
-  mutation($content: String!, $username: String!) {
-    addMessage(data: { content: $content, username: $username }) {
+  mutation($content: String!, $username: String!, $userId: ID!, $chatId: ID!) {
+    addMessage(
+      data: {
+        content: $content
+        username: $username
+        userId: $userId
+        chatId: $chatId
+      }
+    ) {
       id
       content
       username
@@ -12,11 +19,13 @@ const NEW_MESSAGE = gql`
   }
 `;
 
-export const AddMessage = (props) => {
+export const AddMessage = ({ username, chatId, userId }) => {
   const [AddMessage] = useMutation(NEW_MESSAGE);
   const [state, setState] = useState({
-    username: props.username,
+    username: username,
     content: "",
+    chatId,
+    userId,
   });
 
   const handleChange = (e) => {
@@ -25,7 +34,7 @@ export const AddMessage = (props) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (state.username && state.content) {
+      if (state.username && state.content && userId && chatId) {
         await AddMessage({
           variables: state,
         });
@@ -33,7 +42,6 @@ export const AddMessage = (props) => {
         const messagesEl = document.querySelector(".messages");
         messagesEl.scrollTop = messagesEl.scrollHeight;
       }
-      return null;
     } catch (err) {
       console.log(err);
     }
