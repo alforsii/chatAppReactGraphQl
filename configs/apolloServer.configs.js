@@ -30,7 +30,7 @@ exports.apolloServer = new ApolloServer({
   typeDefs: RootTypeDefs,
   resolvers: RootResolvers,
   subscriptions: {
-    path: "/",
+    path: "/subscriptions",
     // onConnect: (connectionParams, webSocket, context) => {
     //   if (connectionParams.authToken) {
     //     return validateToken(connectionParams.authToken).then(

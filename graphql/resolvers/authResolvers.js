@@ -10,23 +10,32 @@ const generateToken = (userId, email) => {
 
 exports.AuthResolvers = {
   Query: {
-    allUsers: async (_, args) => {
+    allUsers: async () => {
       return await User.find().sort({ _id: 1 });
     },
-    someUsers: async ({ page, limit }, req) => {
+    someUsers: async (_, { page, limit }) => {
       const skip = page * limit;
       return await User.find().sort({ _id: 1 }).skip(skip).limit(limit);
+    },
+  },
+  Mutation: {
+    searchedUser: async (_, { email }) => {
+      try {
+        return await User.findOne({ email });
+      } catch (err) {
+        console.log(err);
+        return err;
+      }
     },
     getUser: async (_, { id }) => {
       try {
         return await User.findById(id);
       } catch (err) {
         console.log(err);
+        return err;
       }
     },
-  },
-  Mutation: {
-    isLoggedIn: (_, { token }) => {
+    isLoggedIn: async (_, { token }) => {
       if (!token || token === "") {
         return null;
       }
@@ -35,6 +44,10 @@ exports.AuthResolvers = {
         decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
         if (!decodedToken || !decodedToken.userId || !decodedToken.email) {
           throw new Error("Not authorized!");
+        }
+        const isUserExist = await User.findById(decodedToken.userId);
+        if (!isUserExist) {
+          throw new Error("This account no longer exists!");
         }
         // const newToken = generateToken(decodedToken.userId, decodedToken.email);
         return { userId: decodedToken.userId, token, tokenExpiration: 1 };
@@ -54,7 +67,8 @@ exports.AuthResolvers = {
         return user;
       } catch (err) {
         console.log(err);
-        return { message: err.message };
+        // return { message: err.message };
+        return err;
       }
     },
     login: async (_, { email, password }) => {
@@ -82,7 +96,22 @@ exports.AuthResolvers = {
       }
     },
   },
-  removeUser: async () => {
-    return await User.collection.drop();
+  Subscription: {
+    // searchedUser: {
+    //   subscribe: async (_, { email }, { pubSub }) => {
+    //     try {
+    //       const user = await User.findOne({ email });
+    //       setTimeout(() => {
+    //         // pubSub.publish(`channel`, { [SubscriptionName]: data });
+    //         pubSub.publish(`searched-${user._id}`, { searchedUser: user });
+    //       }, 0);
+    //       //     pubSub.asyncIterator([`channel`]);
+    //       return pubSub.asyncIterator([`searched-${user._id}`]);
+    //     } catch (err) {
+    //       console.log(err);
+    //       return err;
+    //     }
+    //   },
+    // },
   },
 };

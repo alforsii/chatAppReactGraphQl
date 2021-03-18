@@ -6,6 +6,7 @@ const UserSchema = new Schema(
     password: { type: String, require: true },
     firstName: { type: String },
     lastName: { type: String },
+    chats: [{ type: Schema.Types.ObjectId, ref: "Chat" }],
   },
   { timestamps: true }
 );
