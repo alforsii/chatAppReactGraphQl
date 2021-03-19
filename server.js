@@ -17,7 +17,7 @@ const { apolloServer } = require("./configs/apolloServer.configs");
 // });
 
 apolloServer.installSubscriptionHandlers(httpServer);
-apolloServer.applyMiddleware({ app, path: "/", cors: false });
+apolloServer.applyMiddleware({ app, path: "/graphql", cors: false });
 
 // Make sure to call listen on httpServer, NOT on app.
 httpServer.listen(PORT, () => {

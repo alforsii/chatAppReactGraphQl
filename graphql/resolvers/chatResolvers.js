@@ -1,15 +1,5 @@
-const { Message } = require("../../models/Message.model");
 const { Chat } = require("../../models/Chat.model");
 const { User } = require("../../models/User.model");
-
-const publishChats = async () => {
-  const chats = await Chat.find({ chatAuthor: userId }).populate([
-    { path: "chatAuthor" },
-    { path: "chatUsers" },
-    { path: "chatMessages", populate: [{ path: "messageAuthor" }] },
-  ]);
-  pubSub.publish("CHATS", { chats });
-};
 
 exports.ChatResolvers = {
   Query: {
@@ -61,11 +51,10 @@ exports.ChatResolvers = {
           chatUsers: [userId],
         });
 
-        const currentChat = await Chat.findById(newChat._id).populate([
-          { path: "chatAuthor" },
-          { path: "chatUsers" },
-          { path: "chatMessages", populate: [{ path: "messageAuthor" }] },
-        ]);
+        // const currentChat = await Chat.findById(newChat._id).populate([
+        //   { path: "chatAuthor" },
+        //   //   { path: "chatUsers" },
+        // ]);
 
         const updatedUser = await User.findByIdAndUpdate(
           userId,
@@ -79,19 +68,19 @@ exports.ChatResolvers = {
             // populate: [
             //   { path: "chatAuthor" },
             //   { path: "chatUsers" },
-            //   { path: "chatMessages", populate: [{ path: "messageAuthor" }] },
             // ],
           },
         ]);
 
-        pubSub.publish(`${updatedUser._id}`, {
+        // Update user Chats
+        pubSub.publish(`USER_CHATS-${updatedUser._id}`, {
           userChats: updatedUser.chats,
         });
         // pubSub.publish("channel", {
         //   [SubscriptionName]: data,
         // });
 
-        return currentChat;
+        return newChat;
       } catch (err) {
         console.log(err);
         return err;
@@ -103,8 +92,11 @@ exports.ChatResolvers = {
         if (!theChat) return console.log("no chat found");
         const isUserExist = theChat.chatUsers.includes(otherUserId);
         console.log("🚀 isUserExist", isUserExist);
-        if (isUserExist)
-          throw new Error("User already exists in the chatroom!");
+        if (isUserExist) {
+          throw new Error(
+            `User already exists in this chat ${theChat.chatName}!`
+          );
+        }
 
         const updatedChat = await Chat.findByIdAndUpdate(
           chatId,
@@ -128,19 +120,15 @@ exports.ChatResolvers = {
             // populate: [
             //   { path: "chatAuthor" },
             //   { path: "chatUsers" },
-            //   {
-            //     path: "chatMessages",
-            //     populate: [{ path: "messageAuthor" }],
-            //   },
             // ],
           },
         ]);
-        // 1. Add current chat to otherUser chat list
-        pubSub.publish(`${updatedOtherUser._id}`, {
+        // 1. Update current added chat to otherUser chat list
+        pubSub.publish(`USER_CHATS-${updatedOtherUser._id}`, {
           userChats: updatedOtherUser.chats,
         });
         // 2. Update current chat users list for all users since it's the only chat for all
-        pubSub.publish(`${updatedChat._id}`, {
+        pubSub.publish(`CHAT_USERS-${updatedChat._id}`, {
           chatUsers: updatedChat.chatUsers,
         });
 
@@ -160,10 +148,12 @@ exports.ChatResolvers = {
           ]);
           setTimeout(() => {
             // pubSub.publish(`channel`, { [SubscriptionName]: data });
-            pubSub.publish(`${chat._id}`, { chatUsers: chat.chatUsers });
+            pubSub.publish(`CHAT_USERS-${chat._id}`, {
+              chatUsers: chat.chatUsers,
+            });
           }, 0);
           //     pubSub.asyncIterator([`channel`]);
-          return pubSub.asyncIterator([`${chat._id}`]);
+          return pubSub.asyncIterator([`CHAT_USERS-${chat._id}`]);
         } catch (err) {
           console.log(err);
           return err;
@@ -179,19 +169,15 @@ exports.ChatResolvers = {
               //   populate: [
               //     { path: "chatAuthor" },
               //     { path: "chatUsers" },
-              //     {
-              //       path: "chatMessages",
-              //       populate: [{ path: "messageAuthor" }],
-              //     },
               //   ],
             },
           ]);
           setTimeout(() => {
             // pubSub.publish(`channel`, { [SubscriptionName]: data });
-            pubSub.publish(`${user._id}`, { userChats: user.chats });
+            pubSub.publish(`USER_CHATS-${user._id}`, { userChats: user.chats });
           }, 0);
           //     pubSub.asyncIterator([`channel`]);
-          return pubSub.asyncIterator([`${user._id}`]);
+          return pubSub.asyncIterator([`USER_CHATS-${user._id}`]);
         } catch (err) {
           console.log(err);
           return err;

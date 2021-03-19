@@ -113,7 +113,7 @@ export const Messages = ({ username, chatId }) => {
   return (
     <div
       style={{
-        maxHeight: "550px",
+        maxHeight: "500px",
         overflow: "scroll",
         padding: "20px",
       }}
@@ -123,6 +123,8 @@ export const Messages = ({ username, chatId }) => {
         <Spinner animation="border" role="status">
           <span className="sr-only">Loading...</span>
         </Spinner>
+      ) : !chatId ? (
+        <p>Chat not selected!</p>
       ) : sortedMessages.length ? (
         sortedMessages?.map((msgData) => (
           <GroupedMessages key={msgData.id} {...msgData} />

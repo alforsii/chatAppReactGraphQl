@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { gql, useMutation } from "@apollo/client";
-import { Button, Modal, Form, Alert } from "react-bootstrap";
+import { Button, Modal, Form, Alert, Badge } from "react-bootstrap";
 
 // otherUserId, chatId
 const ADD_CHAT_USER_QUERY = gql`
@@ -70,13 +70,23 @@ export default function AddChatUser({ chatId }) {
 
   return (
     <>
-      <Button
+      {/* <Button
         style={{ float: "right" }}
         variant="link"
         onClick={() => setLgShow(true)}
       >
         Add user
-      </Button>
+      </Button> */}
+      <Badge
+        style={{
+          float: "right",
+          cursor: "pointer",
+        }}
+        onClick={() => setLgShow(true)}
+        variant="primary"
+      >
+        +
+      </Badge>
       <Modal
         size="lg"
         show={lgShow}

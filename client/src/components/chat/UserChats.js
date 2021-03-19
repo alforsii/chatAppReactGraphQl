@@ -2,6 +2,7 @@ import React from "react";
 import { gql, useSubscription } from "@apollo/client";
 import { ListGroup } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
+import CreateChat from "./CreateChat";
 
 const USER_CHATS_QUERY = gql`
   subscription($userId: ID!) {
@@ -21,15 +22,27 @@ export default function UserChats({ userId }) {
   if (error) return console.log(error);
 
   return (
-    <div>
+    <>
       <ListGroup variant="flush">
-        <ListGroup.Item variant="primary">User Chats</ListGroup.Item>
+        <ListGroup.Item variant="primary">
+          <span>Your Chats</span>
+          <CreateChat userId={userId} />
+        </ListGroup.Item>
         {data.userChats.map((chat) => (
-          <ListGroup.Item key={chat.id}>
+          <ListGroup.Item
+            style={{
+              marginTop: 5,
+              marginLeft: 10,
+              padding: 5,
+              border: "none",
+              borderBottom: "1px solid #eee",
+            }}
+            key={chat.id}
+          >
             <NavLink to={`/chat/${chat.id}`}>{chat.chatName}</NavLink>
           </ListGroup.Item>
         ))}
       </ListGroup>
-    </div>
+    </>
   );
 }

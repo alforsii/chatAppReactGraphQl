@@ -13,7 +13,7 @@ exports.RootTypeDefs = gql`
     id: ID!
     chatName: String!
     chatAuthor: User!
-    chatMessages: [Message!]
+    # chatMessages: [Message!]
     chatUsers: [User!]
   }
   type Message {

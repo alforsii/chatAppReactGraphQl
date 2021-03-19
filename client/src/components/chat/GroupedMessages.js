@@ -46,16 +46,14 @@ export default function GroupedMessages({ id, type, messages, name }) {
                   ? type === "sent"
                     ? {
                         borderBottomRightRadius: 0,
-                        borderTopRightRadius: "30px",
                       }
                     : {
                         borderBottomLeftRadius: 0,
-                        borderTopLeftRadius: "30px",
                       }
                   : {}
               }
               className={`message ${
-                type === "sent" ? "user_messages" : "others_messages text-muted"
+                type === "sent" ? "user_messages" : "others_messages"
               }`}
             >
               {msg.text}
@@ -77,7 +75,7 @@ export default function GroupedMessages({ id, type, messages, name }) {
           }}
         >
           <Image
-            style={{ width: "40px", height: "40px" }}
+            style={{ width: "40px", height: "40px", margin: "1px" }}
             src="https://source.unsplash.com/user/erondu"
             roundedCircle
           />

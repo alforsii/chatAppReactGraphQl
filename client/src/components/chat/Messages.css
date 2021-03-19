@@ -1,20 +1,23 @@
 .messages {
   max-width: 678px;
-  margin: 10px;
+  /* margin: 10px; */
   scroll-behavior: smooth;
 }
 .message_content i {
   font-size: 0.8rem;
-  padding: 0 15px;
+  margin: 0 15px;
 }
 .message {
+  font-size: 14px;
   max-width: 60%;
-  min-height: 20px;
-  margin: 5px;
-  padding: 7px 15px;
+  cursor: pointer;
+  margin: 1px;
+  /* min-height: 20px; */
+  /* margin: 5px; */
+  padding: 3px 15px;
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
-  border-radius: 20px;
+  border-radius: 30px;
   word-wrap: break-word;
   position: relative;
   -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25),
@@ -27,10 +30,11 @@
 .other_user {
   margin: 0;
   padding: 5px;
+  font-size: 14px;
   text-transform: capitalize;
 }
 .others_messages {
-  background: #f1f1f1;
+  background: rgba(238, 238, 238, 0);
 }
 
 .user_messages {
@@ -61,12 +65,11 @@
   animation-fill-mode: forwards;
   padding: 5px;
   z-index: 1000;
-  cursor: pointer;
   width: 100%;
   background-color: white;
   box-sizing: border-box;
   border-radius: 30px;
-  transform: scaleX(1.03);
+  /* transform: scaleX(1.03); */
 }
 
 @keyframes opacity {

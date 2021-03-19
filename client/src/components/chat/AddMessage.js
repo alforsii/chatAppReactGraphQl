@@ -50,7 +50,7 @@ export const AddMessage = ({ username, chatId, userId }) => {
   return (
     <form className="add_form_main" onSubmit={handleSubmit}>
       <div className="add_form">
-        <div style={{ width: "100%" }}>
+        {/* <div style={{ width: "100%" }}>
           <input
             onChange={handleChange}
             style={{ display: "block", width: "100%" }}
@@ -60,7 +60,7 @@ export const AddMessage = ({ username, chatId, userId }) => {
             value={state.username}
             className="add_form_input"
           />
-        </div>
+        </div> */}
         <div style={{ width: "100%" }}>
           <input
             onChange={handleChange}

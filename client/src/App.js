@@ -112,6 +112,7 @@ function App() {
           logout={handleLogout}
           username={state.user?.email}
         />
+        <div style={{ height: "60px" }}></div>
         {state.message && (
           <Alert
             variant={state.token && state.message ? "success" : "warning"}

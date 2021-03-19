@@ -11,7 +11,7 @@ import { NavLink } from "react-router-dom";
 
 export default function MyNavbar({ token, logout, username }) {
   return (
-    <Navbar bg="light" variant="light">
+    <Navbar fixed="top" bg="light" variant="light">
       <Container>
         <Navbar.Brand href="#home">MyBrand</Navbar.Brand>
         <Nav className="mr-auto">

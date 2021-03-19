@@ -1,7 +1,8 @@
 import React from "react";
 import { gql, useSubscription } from "@apollo/client";
-import { Image, ListGroup } from "react-bootstrap";
+import { Image, ListGroup, Card } from "react-bootstrap";
 import AddChatUser from "./AddChatUser";
+import { NavLink } from "react-router-dom";
 
 const CHAT_USERS_QUERY = gql`
   subscription($chatId: ID!) {
@@ -23,31 +24,53 @@ export default function ChatUsers({ chatId, currentUserId }) {
   if (error) return console.log(error);
 
   return (
-    <div>
-      <ListGroup.Item variant="primary">Chat Users</ListGroup.Item>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          overflowX: "scroll",
-          backgroundColor: "#f8f8f8",
-        }}
-      >
-        {data?.chatUsers
-          .filter((chatUser) => chatUser.id !== currentUserId)
-          .map((chatUser) => (
-            <div key={chatUser.id} style={{ padding: 10, margin: 5 }}>
-              <Image
-                style={{ width: "40px", height: "40px" }}
-                src="https://source.unsplash.com/user/erondu"
-                roundedCircle
-              />
-              <p>{`${chatUser.firstName}`}</p>
+    <>
+      <ListGroup variant="flush">
+        <ListGroup.Item variant="primary">
+          Chat Users
+          <AddChatUser chatId={chatId} />
+        </ListGroup.Item>
+
+        <div
+          style={{
+            overflow: "scroll",
+            // backgroundColor: "#fff",
+            height: "100%",
+          }}
+        >
+          {data?.chatUsers?.length >= 2 ? (
+            data?.chatUsers
+              .filter((chatUser) => chatUser.id !== currentUserId)
+              .map((chatUser) => (
+                <ListGroup.Item
+                  style={{
+                    marginBottom: 2,
+                    padding: 5,
+                    border: "none",
+                    borderBottom: "1px solid #eee",
+                  }}
+                  key={chatUser.id}
+                >
+                  <Image
+                    style={{ width: "40px", height: "40px" }}
+                    src="https://source.unsplash.com/user/erondu"
+                    roundedCircle
+                  />
+                  <NavLink
+                    style={{ marginLeft: 10 }}
+                    to={`/user/${chatUser.id}`}
+                  >
+                    {`${chatUser.firstName} ${chatUser.lastName}`}
+                  </NavLink>
+                </ListGroup.Item>
+              ))
+          ) : (
+            <div style={{ padding: 10, margin: 5 }}>
+              <p>{`No users in the Chat!`}</p>
             </div>
-          ))}
-      </div>
-      <AddChatUser chatId={chatId} />
-    </div>
+          )}
+        </div>
+      </ListGroup>
+    </>
   );
 }

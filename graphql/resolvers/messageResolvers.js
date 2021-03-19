@@ -22,25 +22,32 @@ exports.MessageResolvers = {
           messageAuthor: userId,
           chatId,
         });
-        const updatedChat = await Chat.findByIdAndUpdate(
-          chatId,
-          {
-            $push: { chatMessages: newMessage._id },
-          },
-          { new: true, runValidators: true }
-        ).populate([
-          // { path: "chatAuthor" },
-          { path: "chatMessages", populate: [{ path: "messageAuthor" }] },
-        ]);
 
-        const currentMessage = await Message.findById(newMessage._id).populate(
+        // 1.One to get chatMessages is to add array property to Chat model and push each new message
+        // 2.Another just fond all chat messages through chatId that we add as property of the message. So I use 2 method as it will be easy when we need to remove the message!
+        // const updatedChat = await Chat.findByIdAndUpdate(
+        //   chatId,
+        //   {
+        //     $push: { chatMessages: newMessage._id },
+        //   },
+        //   { new: true, runValidators: true }
+        // ).populate([
+        //   // { path: "chatAuthor" },
+        //   { path: "chatMessages", populate: [{ path: "messageAuthor" }] },
+        // ]);
+        // const messages = updatedChat.chatMessages
+
+        // 2.Better way getting chat messages
+        const messages = await Message.find({ chatId }).populate(
           "messageAuthor"
         );
+
+        // Sent updated messages
         // const messages = await Message.find().populate("messageAuthor");
-        pubSub.publish(`CHAT_MESSAGES-${updatedChat._id}`, {
-          messages: updatedChat.chatMessages,
+        pubSub.publish(`CHAT_MESSAGES-${chatId}`, {
+          messages,
         });
-        return currentMessage;
+        return newMessage;
       } catch (err) {
         console.log(err);
         return err;
@@ -51,17 +58,22 @@ exports.MessageResolvers = {
     messages: {
       subscribe: async (_, { chatId }, { pubSub }) => {
         try {
-          const chat = await Chat.findById(chatId).populate([
-            // { path: "chatAuthor" },
-            { path: "chatMessages", populate: [{ path: "messageAuthor" }] },
-          ]);
+          // const chat = await Chat.findById(chatId).populate([
+          //   // { path: "chatAuthor" },
+          //   { path: "chatMessages", populate: [{ path: "messageAuthor" }] },
+          // ]);
+
+          // 2.Better way getting chat messages
+          const messages = await Message.find({ chatId }).populate(
+            "messageAuthor"
+          );
 
           setTimeout(() => {
-            pubSub.publish(`CHAT_MESSAGES-${chat._id}`, {
-              messages: chat.chatMessages,
+            pubSub.publish(`CHAT_MESSAGES-${chatId}`, {
+              messages,
             });
           }, 0);
-          return pubSub.asyncIterator(`CHAT_MESSAGES-${chat._id}`);
+          return pubSub.asyncIterator(`CHAT_MESSAGES-${chatId}`);
         } catch (err) {
           console.log(err);
           return err;
