@@ -64,7 +64,6 @@
   animation-duration: 0.5s;
   animation-fill-mode: forwards;
   padding: 5px;
-  z-index: 1000;
   width: 100%;
   background-color: white;
   box-sizing: border-box;

@@ -1,29 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import reportWebVitals from "./reportWebVitals";
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
-import { WebSocketLink } from "@apollo/client/link/ws";
+import { ApolloProvider } from "@apollo/client";
 import { BrowserRouter } from "react-router-dom";
 
 import App from "./App";
+import { client } from "./ApolloClient";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
-
-const wsLink = new WebSocketLink({
-  uri: "ws://localhost:8000/subscriptions",
-  options: {
-    reconnect: true,
-    // connectionParams: {
-    //   authToken: JSON.parse(token),
-    // },
-  },
-});
-
-const client = new ApolloClient({
-  link: wsLink,
-  uri: "http://localhost:8000/graphql",
-  cache: new InMemoryCache(),
-});
 
 ReactDOM.render(
   <BrowserRouter>

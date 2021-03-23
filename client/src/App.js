@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { gql, useMutation } from "@apollo/client";
 import { Route, Switch, Redirect } from "react-router-dom";
-import { Alert } from "react-bootstrap";
+import { Container, Spinner } from "react-bootstrap";
 
 import Chat from "./components/chat/Chat";
 import { LoginForm } from "./components/auth/Login";
@@ -9,6 +9,7 @@ import { AuthContext } from "./context/AuthContext";
 import "./App.css";
 import { Signup } from "./components/auth/Signup";
 import MyNavbar from "./components/navbar/MyNavbar";
+import MyAlertMessage from "./components/MyAlertMessage";
 const IS_LOGGED_QUERY = gql`
   mutation($token: String!) {
     isLoggedIn(token: $token) {
@@ -38,6 +39,11 @@ function App() {
     isLoading: false,
     message: "",
     userId: null,
+    chats: [],
+    alertMessage: "",
+    alertMessageId: null,
+    alertSuccess: false,
+    // showAlert: false,
   });
 
   const updateState = (data) => {
@@ -97,6 +103,32 @@ function App() {
     // eslint-disable-next-line
   }, []);
 
+  if (state.isLoading) {
+    return (
+      <Container>
+        <MyNavbar
+          token={state.token}
+          logout={handleLogout}
+          username={state.user?.email}
+        />
+        <div style={{ height: "60px" }}></div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "50vh",
+            width: "80vw",
+          }}
+        >
+          <Spinner animation="border" role="status">
+            <span className="sr-only">Loading...</span>
+          </Spinner>
+        </div>
+      </Container>
+    );
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -113,7 +145,13 @@ function App() {
           username={state.user?.email}
         />
         <div style={{ height: "60px" }}></div>
-        {state.message && (
+        <MyAlertMessage
+          // showAlert={state.showAlert}
+          success={state.alertSuccess}
+          msg={state.alertMessage}
+          msgId={state.alertMessageId}
+        />
+        {/* {state.message && (
           <Alert
             variant={state.token && state.message ? "success" : "warning"}
             onClose={() => updateState({ message: "" })}
@@ -121,7 +159,7 @@ function App() {
           >
             <Alert.Heading>{state.message}</Alert.Heading>
           </Alert>
-        )}
+        )} */}
         <Switch>
           {!state.token && <Redirect from="/chat" to="/" exact />}
           {state.token && <Redirect from="/" to="/chat" exact />}
@@ -136,6 +174,8 @@ function App() {
                     {...props}
                     username={state.user?.email}
                     userId={state.userId}
+                    updateState={updateState}
+                    chats={state.chats}
                   />
                 )}
               />
@@ -148,6 +188,8 @@ function App() {
                     {...props}
                     username={state.user?.email}
                     userId={state.userId}
+                    updateState={updateState}
+                    chats={state.chats}
                   />
                 )}
               />

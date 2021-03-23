@@ -46,6 +46,11 @@ exports.RootTypeDefs = gql`
     message: String
   }
 
+  type ResMessage {
+    id: ID
+    message: String!
+  }
+
   type Query {
     messages: [Message]
     allUsers: [User!]!
@@ -61,8 +66,11 @@ exports.RootTypeDefs = gql`
     login(email: String!, password: String!): AuthData!
     isLoggedIn(token: String!): AuthData!
     createChat(userId: ID!, chatName: String!): Chat!
-    addChatUser(otherUserId: ID!, chatId: ID!): Chat
+    deleteChat(chatId: ID!, userId: ID!): ResMessage!
+    addChatUser(authorId: ID!, otherUserId: ID!, chatId: ID!): Chat
+    deleteChatUser(authorId: ID!, otherUserId: ID!, chatId: ID!): ResMessage!
     searchedUser(email: String!): User
+    updateChat(chatId: ID!, authorId: ID!, chatName: String!): Chat
   }
 
   type Subscription {
