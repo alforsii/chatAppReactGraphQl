@@ -48,7 +48,7 @@ export default function CreateChat() {
               alertMessage: `New ${data.createChat.chatName} chat created!`,
               alertSuccess: true,
               alertMessageId: data.createChat.id,
-              chats: [...ctx.state.state.chats, data?.createChat],
+              chats: [...ctx.state.chats, data?.createChat],
             });
 
             setChatName("");
